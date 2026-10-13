@@ -432,6 +432,23 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
                 <p className="mt-2 text-xl font-extrabold text-auth-orange">{t.loginArabic}</p>
                 <p className="mt-2 text-base text-auth-muted sm:text-lg">{t.loginSubtitle}</p>
 
+                {/* Bouton d'accès rapide / Remplissage automatique test */}
+                <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-orange-50 border border-orange-200/90 p-3.5">
+                  <div className="text-xs text-orange-900">
+                    <span className="font-bold">Compte DG test :</span> <code className="font-mono font-bold text-orange-700 bg-orange-100 px-1.5 py-0.5 rounded text-[11px]">admin@rapido.mr</code>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('admin@rapido.mr');
+                      setPassword('AdminRapido2026!');
+                    }}
+                    className="shrink-0 px-3.5 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition cursor-pointer shadow-sm shadow-orange-500/20"
+                  >
+                    ⚡ Remplir
+                  </button>
+                </div>
+
                 {(errorMessage || noticeMessage) && (
                   <div className={`mt-5 flex items-start gap-3 rounded-2xl border p-4 text-sm ${errorMessage ? 'border-rose-200 bg-rose-50 text-rose-700' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`} role={errorMessage ? 'alert' : 'status'}>
                     <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
