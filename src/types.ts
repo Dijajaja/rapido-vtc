@@ -124,3 +124,33 @@ export interface NotificationItem {
   read: boolean;
   linkTab?: string;
 }
+
+export interface PaymentMethodConfig {
+  id: string;
+  name: string;
+  nameAr: string;
+  type: 'cash' | 'bank_app' | 'wallet';
+  provider: string;
+  color: string;
+  enabled: boolean;
+  isDefault?: boolean;
+  partnershipStatus: 'active' | 'en_negociation' | 'inactif';
+  merchantCode?: string;
+  description: string;
+  descriptionAr: string;
+}
+
+export interface CommissionSettings {
+  globalRate: number;
+  rateByCategory: {
+    economique: number;
+    confort: number;
+    premium: number;
+    van: number;
+  };
+  driverPayoutFrequency: 'daily' | 'weekly' | 'instant';
+  cashCollectionMode: 'wallet_deduction' | 'weekly_invoice';
+  minBalanceToTakeRides: number;
+  taxIncluded: boolean;
+}
+

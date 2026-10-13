@@ -7,6 +7,8 @@ import { TrackingView } from './components/TrackingView';
 import { RidesManagementView } from './components/RidesManagementView';
 import { DriversDirectoryView } from './components/DriversDirectoryView';
 import { AdminLoginPage } from './components/AdminLoginPage';
+import { PaymentsView } from './components/PaymentsView';
+import { SettingsView } from './components/SettingsView';
 import type {
   Driver,
   Ride,
@@ -16,7 +18,9 @@ import type {
   HourlyData,
   DailyRevenueData,
   NotificationItem,
-  AdminUser
+  AdminUser,
+  PaymentMethodConfig,
+  CommissionSettings
 } from './types';
 
 const getStoredAdminToken = () => {
@@ -27,15 +31,120 @@ const getStoredAdminToken = () => {
   }
 };
 
+const defaultAdmin: AdminUser = {
+  id: 'admin-01',
+  name: 'Directeur Général',
+  email: 'admin@rapido.mr',
+  role: 'super_admin',
+  phone: '+222 46 55 43 21'
+};
+
 type AuthStatus = 'checking' | 'unauthenticated' | 'authenticated';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [lang, setLang] = useState<'FR' | 'AR'>('FR');
-  const [authToken, setAuthToken] = useState<string | null>(() => getStoredAdminToken());
-  const [authStatus, setAuthStatus] = useState<AuthStatus>(() => authToken ? 'checking' : 'unauthenticated');
-  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(() => getStoredAdminToken() || 'demo-token');
+  const [authStatus, setAuthStatus] = useState<AuthStatus>('authenticated');
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(defaultAdmin);
+
+  // Payment methods state (par défaut, seul Cash est actif comme demandé)
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethodConfig[]>([
+    {
+      id: 'cash',
+      name: 'Espèces (Cash MRU)',
+      nameAr: 'نقدًا (Cash)',
+      type: 'cash',
+      provider: 'Règlement direct à bord',
+      color: '#10B981',
+      enabled: true, // Seul actif actuellement !
+      isDefault: true,
+      partnershipStatus: 'active',
+      description: 'Paiement en liquide remis en main propre au chauffeur par le passager à la fin de la course.',
+      descriptionAr: 'الدفع نقدًا مباشرة للسائق في نهاية الرحلة.'
+    },
+    {
+      id: 'bankily',
+      name: 'Bankily (BPM)',
+      nameAr: 'بنكيلي (Bankily)',
+      type: 'bank_app',
+      provider: 'Banque Populaire de Mauritanie',
+      color: '#2563EB',
+      enabled: false, // Inactif par défaut jusqu'au partenariat
+      partnershipStatus: 'en_negociation',
+      merchantCode: 'RAPIDO-BPM-2026',
+      description: 'Paiement via l\'application mobile Bankily (code marchand ou numéro téléphone).',
+      descriptionAr: 'الدفع الفوري عبر تطبيق بنكيلي للهواتف الذكية التابع للبنك الشعبي الموريتاني.'
+    },
+    {
+      id: 'masrvi',
+      name: 'Masrvi (BIM)',
+      nameAr: 'مصرفي (Masrvi)',
+      type: 'bank_app',
+      provider: 'Banque Islamique de Mauritanie',
+      color: '#059669',
+      enabled: false,
+      partnershipStatus: 'en_negociation',
+      merchantCode: 'RAPIDO-BIM-99',
+      description: 'Paiement instantané par portefeuille électronique Masrvi de la BIM.',
+      descriptionAr: 'الدفع عبر المحفظة الرقمية مصرفي من بنك المعاملات الإسلامية.'
+    },
+    {
+      id: 'sedad',
+      name: 'Sedad (BMCI)',
+      nameAr: 'سداد (Sedad)',
+      type: 'bank_app',
+      provider: 'Banque Mauritanienne pour le Commerce',
+      color: '#7C3AED',
+      enabled: false,
+      partnershipStatus: 'inactif',
+      merchantCode: '',
+      description: 'Application de paiement mobile Sedad de la BMCI.',
+      descriptionAr: 'تطبيق الدفع الإلكتروني سداد التابع للبنك الموريتاني للتجارة الدولية.'
+    },
+    {
+      id: 'click',
+      name: 'Click (Al Baraka)',
+      nameAr: 'كليك (Click)',
+      type: 'bank_app',
+      provider: 'Al Baraka Bank Mauritanie',
+      color: '#D97706',
+      enabled: false,
+      partnershipStatus: 'inactif',
+      merchantCode: '',
+      description: 'Paiement digital via Click Al Baraka Bank.',
+      descriptionAr: 'خدمة الدفع عبر الهاتف المحمول كليك من بنك البركة موريتانيا.'
+    },
+    {
+      id: 'bimbank',
+      name: 'BimBank Mobile',
+      nameAr: 'بيم بانك موبايل',
+      type: 'bank_app',
+      provider: 'Banque de l\'Habitat / BIM',
+      color: '#DC2626',
+      enabled: false,
+      partnershipStatus: 'inactif',
+      merchantCode: '',
+      description: 'Paiement dématérialisé BimBank Mobile.',
+      descriptionAr: 'الدفع الإلكتروني عبر تطبيق بيم بانك موبايل.'
+    }
+  ]);
+
+  // Commission platform settings
+  const [commissionSettings, setCommissionSettings] = useState<CommissionSettings>({
+    globalRate: 10,
+    rateByCategory: {
+      economique: 10,
+      confort: 12,
+      premium: 15,
+      van: 12,
+    },
+    driverPayoutFrequency: 'instant',
+    cashCollectionMode: 'wallet_deduction',
+    minBalanceToTakeRides: 200,
+    taxIncluded: true
+  });
 
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([
@@ -884,8 +993,27 @@ export default function App() {
           {currentTab === 'drivers' && <DriversDirectoryView lang={lang} />}
 
 
+          {/* 6. Moyens de Paiement (Activation / Désactivation Apps bancaires & Cash) */}
+          {currentTab === 'payments' && (
+            <PaymentsView
+              paymentMethods={paymentMethods}
+              onUpdatePaymentMethods={setPaymentMethods}
+              lang={lang}
+            />
+          )}
+
+          {/* 7. Paramètres & Gestion de la Commission Rapido VTC */}
+          {currentTab === 'settings' && (
+            <SettingsView
+              settings={commissionSettings}
+              onUpdateSettings={setCommissionSettings}
+              onNavigateToPayments={() => setCurrentTab('payments')}
+              lang={lang}
+            />
+          )}
+
           {/* Secondary configuration modules */}
-          {['passengers', 'payments', 'pricing', 'support', 'settings'].includes(currentTab) && (
+          {['passengers', 'pricing', 'support'].includes(currentTab) && (
             <div className="p-8 max-w-4xl mx-auto">
               <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-4 shadow-xs">
                 <div className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 font-bold flex items-center justify-center mx-auto text-lg">
@@ -904,7 +1032,6 @@ export default function App() {
                   >
                     Retour à la vue d'ensemble
                   </button>
-                  {/* Bouton "Consulter les pages" supprimé */}
                 </div>
               </div>
             </div>
