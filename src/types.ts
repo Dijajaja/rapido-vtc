@@ -154,3 +154,59 @@ export interface CommissionSettings {
   taxIncluded: boolean;
 }
 
+export interface Passenger {
+  id: string;
+  name: string;
+  phone: string;
+  rating: number;
+  totalRides: number;
+  spentMru: number;
+  status: 'actif' | 'bloque';
+  joinedDate: string;
+  lastRideDate: string;
+  preferredPayment: 'Cash' | 'Bankily' | 'Masrvi';
+}
+
+export interface PricingCategoryRule {
+  baseFareMru: number;
+  pricePerKmMru: number;
+  pricePerMinMru: number;
+  minFareMru: number;
+  cancellationFeeMru: number;
+}
+
+export interface PricingSettings {
+  rules: {
+    economique: PricingCategoryRule;
+    confort: PricingCategoryRule;
+    premium: PricingCategoryRule;
+    van: PricingCategoryRule;
+  };
+  flatRates: {
+    id: string;
+    from: string;
+    to: string;
+    priceMru: number;
+    category: string;
+  }[];
+  nightMultiplier: number;
+  peakHourMultiplier: number;
+}
+
+export interface SupportTicket {
+  id: string;
+  ref: string;
+  userType: 'passager' | 'chauffeur';
+  userName: string;
+  userPhone: string;
+  subject: string;
+  category: 'objet_perdu' | 'paiement' | 'comportement' | 'application' | 'autre';
+  status: 'ouvert' | 'en_cours' | 'resolu';
+  priority: 'urgente' | 'normale' | 'basse';
+  createdAt: string;
+  description: string;
+  rideRef?: string;
+  adminResponse?: string;
+}
+
+

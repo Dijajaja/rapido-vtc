@@ -3,18 +3,7 @@ import {
   Banknote,
   Smartphone,
   CheckCircle2,
-  AlertCircle,
-  ShieldCheck,
-  Building2,
-  Settings2,
-  Save,
-  ArrowRight,
-  Info,
-  DollarSign,
-  Percent,
-  Check,
-  Power,
-  RotateCcw
+  Info
 } from 'lucide-react';
 import type { PaymentMethodConfig } from '../types';
 import type { Lang } from '../lib/translations';
@@ -32,13 +21,11 @@ export const PaymentsView: React.FC<PaymentsViewProps> = ({
 }) => {
   const [methods, setMethods] = useState<PaymentMethodConfig[]>(paymentMethods);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodConfig | null>(null);
 
   const isArabic = lang === 'AR';
 
   // Toggle activation of a payment method
   const handleToggle = (id: string) => {
-    // Prevent disabling Cash if it's the only one enabled
     const target = methods.find((m) => m.id === id);
     if (!target) return;
 
@@ -73,10 +60,10 @@ export const PaymentsView: React.FC<PaymentsViewProps> = ({
     const actionText = toggled?.enabled
       ? isArabic
         ? `تم تفعيل ${toggled.nameAr} بنجاح`
-        : `${toggled?.name} activé avec succès pour les clients`
+        : `${toggled?.name} activé avec succès`
       : isArabic
       ? `تم تعطيل ${toggled?.nameAr}`
-      : `${toggled?.name} désactivé. Les clients ne pourront plus le sélectionner`;
+      : `${toggled?.name} désactivé`;
 
     showToast(actionText);
   };
@@ -85,12 +72,12 @@ export const PaymentsView: React.FC<PaymentsViewProps> = ({
     const updated = methods.map((m) => (m.id === id ? { ...m, merchantCode: code } : m));
     setMethods(updated);
     onUpdatePaymentMethods(updated);
-    showToast(isArabic ? 'تم تحديث كود التاجر' : 'Code marchand mis à jour avec succès');
+    showToast(isArabic ? 'تم تحديث كود التاجر' : 'Code marchand mis à jour');
   };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   const activeCount = methods.filter((m) => m.enabled).length;
@@ -118,8 +105,8 @@ export const PaymentsView: React.FC<PaymentsViewProps> = ({
             </h1>
             <p className="text-sm text-slate-500 mt-1 max-w-3xl">
               {isArabic
-                ? 'حاليًا، يدفع العملاء نقدًا فقط (Cash). يمكنك تفعيل التطبيقات البنكية (Bankily, Masrvi, Sedad...) بمجرد توقيع اتفاقيات الشراكة والربط البرمجي.'
-                : 'Pour le moment, les clients payent uniquement en Cash (espèces). Activez les passerelles bancaires mauritaniennes (Bankily, Masrvi, Sedad, Click) dès finalisation de vos conventions de partenariat.'}
+                ? 'حاليًا، يدفع العملاء نقدًا فقط (Cash). يمكنك تفعيل التطبيقات البنكية بمجرد توقيع اتفاقيات الشراكة.'
+                : 'Pour le moment, les clients payent uniquement en Cash (espèces). Activez les passerelles bancaires mauritaniennes dès validation des accords de partenariat.'}
             </p>
           </div>
 
@@ -148,14 +135,14 @@ export const PaymentsView: React.FC<PaymentsViewProps> = ({
           <div className="text-xs text-amber-900 leading-relaxed">
             <strong>{isArabic ? 'توجيه الإدارة العامة :' : 'Règle opérationnelle en vigueur :'}</strong>{' '}
             {isArabic
-              ? 'الدفع نقدًا (Cash) هو الوسيلة الإلزامية المفتوحة للركاب في نواكشوط حاليًا. التطبيقات البنكية غير مفعلة افتراضيًا لتفادي أي خلل حتى تسليم مفاتيح الـ API من قبل البنوك الشريكة.'
-              : 'Le paiement en espèces (Cash) est le mode de règlement actif par défaut pour les passagers à Nouakchott. Les intégrations bancaires sont prêtes et peuvent être activées d\'un simple clic dès que les protocoles API bancaires sont validés avec vos partenaires.'}
+              ? 'الدفع نقدًا (Cash) هو الوسيلة المفتوحة للركاب حاليًا. التطبيقات البنكية تفعل بنقرة واحدة عند توقيع الاتفاقية.'
+              : 'Le paiement en espèces (Cash) est le mode de règlement actif par défaut pour les passagers à Nouakchott. Les intégrations bancaires peuvent être activées d\'un simple clic dès que vos conventions sont signées.'}
           </div>
         </div>
       </div>
 
       {/* Grid of Payment Methods */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {methods.map((method) => {
           const isCash = method.id === 'cash';
 
@@ -169,7 +156,7 @@ export const PaymentsView: React.FC<PaymentsViewProps> = ({
               }`}
             >
               <div>
-                {/* Card Top: Logo / Tag / Toggle switch */}
+                {/* Card Top: Logo / Name / Toggle switch */}
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
                     <div
@@ -204,13 +191,8 @@ export const PaymentsView: React.FC<PaymentsViewProps> = ({
                   </button>
                 </div>
 
-                {/* Description */}
-                <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-                  {isArabic ? method.descriptionAr : method.description}
-                </p>
-
                 {/* Partnership Status Badge */}
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-2">
                   <span
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
                       method.enabled
@@ -225,11 +207,11 @@ export const PaymentsView: React.FC<PaymentsViewProps> = ({
                     />
                     {method.enabled
                       ? isArabic
-                        ? 'متاح للعملاء (نشط)'
-                        : 'Disponible pour les clients'
+                        ? 'متاح'
+                        : 'Disponible'
                       : isArabic
-                      ? 'معطل (غير معروض)'
-                      : 'Désactivé (masqué dans l\'app)'}
+                      ? 'معطل'
+                      : 'Désactivé'}
                   </span>
 
                   {isCash && (
@@ -240,124 +222,28 @@ export const PaymentsView: React.FC<PaymentsViewProps> = ({
                 </div>
               </div>
 
-              {/* Card Footer: Configuration for Partner Apps */}
-              <div className="pt-4 border-t border-slate-100 space-y-2">
-                {!isCash ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-[11px] text-slate-500">
-                      <span>{isArabic ? 'كود التاجر (Code Marchand) :' : 'Identifiant Marchand API :'}</span>
-                      <span className="font-mono text-slate-700 font-semibold">
-                        {method.merchantCode || (isArabic ? 'غير مضبوط' : 'Non configuré')}
-                      </span>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        defaultValue={method.merchantCode || ''}
-                        placeholder={isArabic ? 'أدخل كود الشراكة...' : 'Ex: RAPIDO-BPM-2026'}
-                        className="flex-1 px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-orange-500"
-                        onBlur={(e) => handleUpdateMerchantCode(method.id, e.target.value)}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-[11px] text-slate-500 flex items-center gap-1.5 py-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>
-                      {isArabic
-                        ? 'التحصيل يتم مباشرة بين الراكب والسائق'
-                        : 'Règlement direct passager ➔ chauffeur'}
+              {/* Card Footer: Merchant code input for partner apps */}
+              {!isCash && (
+                <div className="pt-4 border-t border-slate-100 space-y-2">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500">
+                    <span>{isArabic ? 'كود التاجر (Code Marchand) :' : 'Identifiant Marchand API :'}</span>
+                    <span className="font-mono text-slate-700 font-semibold">
+                      {method.merchantCode || (isArabic ? 'غير مضبوط' : 'Non configuré')}
                     </span>
                   </div>
-                )}
-              </div>
+
+                  <input
+                    type="text"
+                    defaultValue={method.merchantCode || ''}
+                    placeholder={isArabic ? 'أدخل كود الشراكة...' : 'Ex: RAPIDO-BPM-2026'}
+                    className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-orange-500"
+                    onBlur={(e) => handleUpdateMerchantCode(method.id, e.target.value)}
+                  />
+                </div>
+              )}
             </div>
           );
         })}
-      </div>
-
-      {/* Mobile Client App Live Preview Simulation */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 md:p-8 border border-slate-800">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 text-emerald-400 text-xs font-semibold mb-2">
-              <Smartphone className="w-3.5 h-3.5" />
-              {isArabic ? 'محاكاة تطبيق الراكب' : 'Aperçu en direct : Vue côté Passager'}
-            </div>
-            <h3 className="text-xl font-bold text-white">
-              {isArabic
-                ? 'خيارات الدفع المعروضة للعميل عند طلب رحلة'
-                : 'Options de paiement affichées au client lors de sa commande'}
-            </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
-              {isArabic
-                ? 'يتغير هذا العرض في الوقت الفعلي عند تشغيل أو إيقاف أي وسيلة بالأعلى.'
-                : 'Cet aperçu se met à jour immédiatement quand vous activez ou désactivez une option ci-dessus.'}
-            </p>
-          </div>
-          <div className="text-xs text-slate-400 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
-            {isArabic ? 'العملة الرسمية :' : 'Devise :'}{' '}
-            <strong className="text-orange-400">MRU (أوقية جديدة)</strong>
-          </div>
-        </div>
-
-        {/* Mock Mobile Screen */}
-        <div className="max-w-md mx-auto bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-2xl">
-          <div className="text-xs text-slate-400 mb-3 flex items-center justify-between">
-            <span>{isArabic ? 'اختر طريقة الدفع للرحلة' : 'Sélectionnez votre mode de paiement :'}</span>
-            <span className="text-emerald-400 font-semibold">{activeCount} disponible(s)</span>
-          </div>
-
-          <div className="space-y-2.5">
-            {methods
-              .filter((m) => m.enabled)
-              .map((m, idx) => (
-                <div
-                  key={m.id}
-                  className={`p-3.5 rounded-xl border flex items-center justify-between ${
-                    idx === 0
-                      ? 'border-orange-500/80 bg-orange-500/10 text-white'
-                      : 'border-slate-800 bg-slate-900/60 text-slate-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
-                      style={{ backgroundColor: m.color }}
-                    >
-                      {m.id === 'cash' ? <Banknote className="w-4 h-4" /> : <Smartphone className="w-4 h-4" />}
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold">{isArabic ? m.nameAr : m.name}</div>
-                      <div className="text-[10px] text-slate-400">{m.provider}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {idx === 0 && (
-                      <span className="text-[10px] bg-orange-500 text-white px-2 py-0.5 rounded-full font-bold">
-                        {isArabic ? 'محدد' : 'Sélectionné'}
-                      </span>
-                    )}
-                    <div
-                      className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                        idx === 0 ? 'border-orange-500 bg-orange-500' : 'border-slate-600'
-                      }`}
-                    >
-                      {idx === 0 && <Check className="w-3 h-3 text-white" />}
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-500 text-center">
-            {isArabic
-              ? 'تتم معالجة العمولات تلقائيًا وفق الإعدادات المحددة في النظام.'
-              : 'La commission Rapido est déduite automatiquement selon la grille configurée.'}
-          </div>
-        </div>
       </div>
     </div>
   );

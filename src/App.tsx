@@ -9,6 +9,9 @@ import { DriversDirectoryView } from './components/DriversDirectoryView';
 import { AdminLoginPage } from './components/AdminLoginPage';
 import { PaymentsView } from './components/PaymentsView';
 import { SettingsView } from './components/SettingsView';
+import { PassengersView } from './components/PassengersView';
+import { PricingView } from './components/PricingView';
+import { SupportView } from './components/SupportView';
 import type {
   Driver,
   Ride,
@@ -20,7 +23,10 @@ import type {
   NotificationItem,
   AdminUser,
   PaymentMethodConfig,
-  CommissionSettings
+  CommissionSettings,
+  Passenger,
+  PricingSettings,
+  SupportTicket
 } from './types';
 
 const getStoredAdminToken = () => {
@@ -61,8 +67,8 @@ export default function App() {
       enabled: true, // Seul actif actuellement !
       isDefault: true,
       partnershipStatus: 'active',
-      description: 'Paiement en liquide remis en main propre au chauffeur par le passager à la fin de la course.',
-      descriptionAr: 'الدفع نقدًا مباشرة للسائق في نهاية الرحلة.'
+      description: 'Paiement en liquide remis au chauffeur.',
+      descriptionAr: 'الدفع نقدًا مباشرة للسائق.'
     },
     {
       id: 'bankily',
@@ -71,11 +77,11 @@ export default function App() {
       type: 'bank_app',
       provider: 'Banque Populaire de Mauritanie',
       color: '#2563EB',
-      enabled: false, // Inactif par défaut jusqu'au partenariat
+      enabled: false,
       partnershipStatus: 'en_negociation',
       merchantCode: 'RAPIDO-BPM-2026',
-      description: 'Paiement via l\'application mobile Bankily (code marchand ou numéro téléphone).',
-      descriptionAr: 'الدفع الفوري عبر تطبيق بنكيلي للهواتف الذكية التابع للبنك الشعبي الموريتاني.'
+      description: 'Paiement instantané via l\'application Bankily.',
+      descriptionAr: 'الدفع الفوري عبر تطبيق بنكيلي للهواتف الذكية.'
     },
     {
       id: 'masrvi',
@@ -87,47 +93,8 @@ export default function App() {
       enabled: false,
       partnershipStatus: 'en_negociation',
       merchantCode: 'RAPIDO-BIM-99',
-      description: 'Paiement instantané par portefeuille électronique Masrvi de la BIM.',
+      description: 'Paiement par portefeuille Masrvi de la BIM.',
       descriptionAr: 'الدفع عبر المحفظة الرقمية مصرفي من بنك المعاملات الإسلامية.'
-    },
-    {
-      id: 'sedad',
-      name: 'Sedad (BMCI)',
-      nameAr: 'سداد (Sedad)',
-      type: 'bank_app',
-      provider: 'Banque Mauritanienne pour le Commerce',
-      color: '#7C3AED',
-      enabled: false,
-      partnershipStatus: 'inactif',
-      merchantCode: '',
-      description: 'Application de paiement mobile Sedad de la BMCI.',
-      descriptionAr: 'تطبيق الدفع الإلكتروني سداد التابع للبنك الموريتاني للتجارة الدولية.'
-    },
-    {
-      id: 'click',
-      name: 'Click (Al Baraka)',
-      nameAr: 'كليك (Click)',
-      type: 'bank_app',
-      provider: 'Al Baraka Bank Mauritanie',
-      color: '#D97706',
-      enabled: false,
-      partnershipStatus: 'inactif',
-      merchantCode: '',
-      description: 'Paiement digital via Click Al Baraka Bank.',
-      descriptionAr: 'خدمة الدفع عبر الهاتف المحمول كليك من بنك البركة موريتانيا.'
-    },
-    {
-      id: 'bimbank',
-      name: 'BimBank Mobile',
-      nameAr: 'بيم بانك موبايل',
-      type: 'bank_app',
-      provider: 'Banque de l\'Habitat / BIM',
-      color: '#DC2626',
-      enabled: false,
-      partnershipStatus: 'inactif',
-      merchantCode: '',
-      description: 'Paiement dématérialisé BimBank Mobile.',
-      descriptionAr: 'الدفع الإلكتروني عبر تطبيق بيم بانك موبايل.'
     }
   ]);
 
@@ -145,6 +112,175 @@ export default function App() {
     minBalanceToTakeRides: 200,
     taxIncluded: true
   });
+
+  // Passengers State
+  const [passengers, setPassengers] = useState<Passenger[]>([
+    {
+      id: 'pass-01',
+      name: 'Aissata Kane',
+      phone: '+222 46 12 34 56',
+      rating: 4.9,
+      totalRides: 38,
+      spentMru: 6840,
+      status: 'actif',
+      joinedDate: '12/01/2026',
+      lastRideDate: 'Aujourd\'hui 09:15',
+      preferredPayment: 'Cash',
+    },
+    {
+      id: 'pass-02',
+      name: 'Ahmed Salem Ould Bilal',
+      phone: '+222 36 98 74 12',
+      rating: 4.7,
+      totalRides: 24,
+      spentMru: 4320,
+      status: 'actif',
+      joinedDate: '28/01/2026',
+      lastRideDate: 'Hier 18:40',
+      preferredPayment: 'Cash',
+    },
+    {
+      id: 'pass-03',
+      name: 'Mariam Diop',
+      phone: '+222 22 45 67 89',
+      rating: 5.0,
+      totalRides: 52,
+      spentMru: 11200,
+      status: 'actif',
+      joinedDate: '05/01/2026',
+      lastRideDate: 'Aujourd\'hui 11:20',
+      preferredPayment: 'Cash',
+    },
+    {
+      id: 'pass-04',
+      name: 'Sidi Mohamed Lemine',
+      phone: '+222 44 33 22 11',
+      rating: 3.8,
+      totalRides: 9,
+      spentMru: 1620,
+      status: 'bloque',
+      joinedDate: '15/02/2026',
+      lastRideDate: 'Il y a 3 jours',
+      preferredPayment: 'Cash',
+    },
+    {
+      id: 'pass-05',
+      name: 'Fatimetou Mint Mokhtar',
+      phone: '+222 49 88 77 66',
+      rating: 4.8,
+      totalRides: 31,
+      spentMru: 5580,
+      status: 'actif',
+      joinedDate: '10/02/2026',
+      lastRideDate: 'Hier 21:05',
+      preferredPayment: 'Cash',
+    },
+  ]);
+
+  // Pricing State
+  const [pricingSettings, setPricingSettings] = useState<PricingSettings>({
+    rules: {
+      economique: {
+        baseFareMru: 40,
+        pricePerKmMru: 12,
+        pricePerMinMru: 2,
+        minFareMru: 70,
+        cancellationFeeMru: 30,
+      },
+      confort: {
+        baseFareMru: 60,
+        pricePerKmMru: 16,
+        pricePerMinMru: 3,
+        minFareMru: 100,
+        cancellationFeeMru: 40,
+      },
+      premium: {
+        baseFareMru: 100,
+        pricePerKmMru: 24,
+        pricePerMinMru: 5,
+        minFareMru: 180,
+        cancellationFeeMru: 60,
+      },
+      van: {
+        baseFareMru: 80,
+        pricePerKmMru: 20,
+        pricePerMinMru: 4,
+        minFareMru: 150,
+        cancellationFeeMru: 50,
+      },
+    },
+    flatRates: [
+      {
+        id: 'fr-01',
+        from: 'Tevragh Zeina',
+        to: 'Aéroport Int. Oumtounsy',
+        priceMru: 450,
+        category: 'Berline Confort / Premium',
+      },
+      {
+        id: 'fr-02',
+        from: 'Centre-ville / Marché Capitale',
+        to: 'Plage des Pêcheurs',
+        priceMru: 150,
+        category: 'Économique / Confort',
+      },
+      {
+        id: 'fr-03',
+        from: 'Ksar / Carrefour Sabah',
+        to: 'Université de Nouakchott',
+        priceMru: 120,
+        category: 'Toutes catégories',
+      },
+    ],
+    nightMultiplier: 1.2,
+    peakHourMultiplier: 1.3,
+  });
+
+  // Support Tickets State
+  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>([
+    {
+      id: 'tick-01',
+      ref: 'TICK-481',
+      userType: 'passager',
+      userName: 'Khadijetou Bâ',
+      userPhone: '+222 49 11 00 77',
+      subject: 'Objet oublié dans le véhicule',
+      category: 'objet_perdu',
+      status: 'ouvert',
+      priority: 'urgente',
+      createdAt: 'Aujourd\'hui 10:15',
+      description: 'J\'ai oublié un sac contenant des documents dans la Toyota Corolla blanche lors de ma course ce matin.',
+      rideRef: '#R-48205',
+    },
+    {
+      id: 'tick-02',
+      ref: 'TICK-478',
+      userType: 'chauffeur',
+      userName: 'Amadou Ould Cheikh',
+      userPhone: '+222 46 55 43 21',
+      subject: 'Contestation détour zone éloignée',
+      category: 'paiement',
+      status: 'ouvert',
+      priority: 'normale',
+      createdAt: 'Aujourd\'hui 08:30',
+      description: 'Le passager a demandé un détour prolongé par Dar Naim sans ajustement de tarif.',
+      rideRef: '#R-48199',
+    },
+    {
+      id: 'tick-03',
+      ref: 'TICK-465',
+      userType: 'passager',
+      userName: 'Ahmed Salem',
+      userPhone: '+222 36 98 74 12',
+      subject: 'Service Confort très apprécié',
+      category: 'autre',
+      status: 'resolu',
+      priority: 'basse',
+      createdAt: 'Hier 19:00',
+      description: 'Remerciements pour la ponctualité et la climatisation impeccable vers l\'Aéroport.',
+      adminResponse: 'Merci pour votre confiance, le chauffeur a reçu une prime de satisfaction.',
+    },
+  ]);
 
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([
@@ -1008,33 +1144,48 @@ export default function App() {
               settings={commissionSettings}
               onUpdateSettings={setCommissionSettings}
               onNavigateToPayments={() => setCurrentTab('payments')}
+              onLogout={handleLogout}
               lang={lang}
             />
           )}
 
-          {/* Secondary configuration modules */}
-          {['passengers', 'pricing', 'support'].includes(currentTab) && (
-            <div className="p-8 max-w-4xl mx-auto">
-              <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-4 shadow-xs">
-                <div className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 font-bold flex items-center justify-center mx-auto text-lg">
-                  MRU
-                </div>
-                <h2 className="text-xl font-bold text-slate-900">
-                  Module {currentTab.toUpperCase()} · Rapido Nouakchott
-                </h2>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  Ce module reste à implémenter et à raccorder au backend de l’équipe.
-                </p>
-                <div className="pt-2 flex justify-center gap-3">
-                  <button
-                    onClick={() => setCurrentTab('overview')}
-                    className="px-4 py-2 rounded-xl bg-orange-500 text-white text-xs font-bold shadow-xs hover:bg-orange-600 cursor-pointer"
-                  >
-                    Retour à la vue d'ensemble
-                  </button>
-                </div>
-              </div>
-            </div>
+          {/* 8. Passagers (Répertoire des clients) */}
+          {currentTab === 'passengers' && (
+            <PassengersView
+              passengers={passengers}
+              onTogglePassengerStatus={(id) => {
+                setPassengers((prev) =>
+                  prev.map((p) =>
+                    p.id === id ? { ...p, status: p.status === 'actif' ? 'bloque' : 'actif' } : p
+                  )
+                );
+              }}
+              lang={lang}
+            />
+          )}
+
+          {/* 9. Tarification & Forfaits Fixes */}
+          {currentTab === 'pricing' && (
+            <PricingView
+              pricing={pricingSettings}
+              onUpdatePricing={setPricingSettings}
+              lang={lang}
+            />
+          )}
+
+          {/* 10. Support & Réclamations */}
+          {currentTab === 'support' && (
+            <SupportView
+              tickets={supportTickets}
+              onResolveTicket={(id, response) => {
+                setSupportTickets((prev) =>
+                  prev.map((t) =>
+                    t.id === id ? { ...t, status: 'resolu', adminResponse: response } : t
+                  )
+                );
+              }}
+              lang={lang}
+            />
           )}
         </main>
       </div>

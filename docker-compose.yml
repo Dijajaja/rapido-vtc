@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # MongoDB Database Service
+  mongodb:
+    image: mongo:7.0
+    container_name: rapido-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: rapido_admin
+      MONGO_INITDB_ROOT_PASSWORD: RapidoPassword2026!
+      MONGO_INITDB_DATABASE: rapido_vtc
+    volumes:
+      - mongodb_data:/data/db
+
+  # Interface Web visuelle pour voir vos données MongoDB (optionnel)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: rapido-mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: rapido_admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: RapidoPassword2026!
+      ME_CONFIG_MONGODB_URL: mongodb://rapido_admin:RapidoPassword2026!@mongodb:27017/?authSource=admin
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    depends_on:
+      - mongodb
+
+volumes:
+  mongodb_data:
