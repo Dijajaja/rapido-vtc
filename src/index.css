@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --color-auth-navy: #13243a;
+  --color-auth-navy-deep: #0f1c2e;
+  --color-auth-orange: #ff7900;
+  --color-auth-panel: #f4f5f7;
+  --color-auth-ink: #111d30;
+  --color-auth-muted: #657185;
+  --color-auth-line: #e2e7ee;
+  --color-auth-info: #e8eff8;
+  --font-tajawal: "Tajawal", sans-serif;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+}
+
+@layer components {
+  .auth-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-form-panel {
+    position: relative;
+  }
+
+  .auth-brand-panel {
+    background:
+      radial-gradient(ellipse at 70% 20%, rgba(37, 71, 110, 0.44), transparent 42%),
+      linear-gradient(155deg, var(--color-auth-navy) 0%, var(--color-auth-navy-deep) 100%);
+  }
+
+  .auth-map-grid {
+    opacity: 0.4;
+    background-image:
+      linear-gradient(164deg, transparent 0 25%, rgba(75, 108, 148, 0.22) 25.2% 25.7%, transparent 25.9%),
+      linear-gradient(12deg, transparent 0 57%, rgba(75, 108, 148, 0.17) 57.2% 57.7%, transparent 57.9%),
+      linear-gradient(90deg, rgba(100, 130, 166, 0.14) 1px, transparent 1px),
+      linear-gradient(rgba(100, 130, 166, 0.14) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
+    transform: rotate(-13deg) scale(1.25);
+    mask-image: linear-gradient(to bottom, black 0%, black 62%, transparent 100%);
+  }
+
+  .auth-route-lines {
+    opacity: 0.22;
+    background-image:
+      linear-gradient(50deg, transparent 0 37%, rgba(94, 124, 158, 0.3) 37.2% 37.7%, transparent 37.9%),
+      linear-gradient(128deg, transparent 0 48%, rgba(94, 124, 158, 0.24) 48.2% 48.7%, transparent 48.9%);
+  }
+
+  .auth-map-label {
+    position: absolute;
+    color: rgba(141, 164, 192, 0.23);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+  }
+
+  .auth-map-label-one {
+    left: 39%;
+    top: 33%;
+  }
+
+  .auth-map-label-two {
+    left: 31%;
+    top: 57%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-page {
+    grid-template-columns: minmax(0, 44.5fr) minmax(0, 55.5fr);
+  }
+
+  .auth-brand-panel,
+  .auth-form-panel {
+    min-height: 100svh;
+  }
+}
+
+@media (max-width: 1023px) {
+  .auth-form-panel {
+    padding-bottom: 5.5rem;
+  }
+}
