@@ -48,10 +48,3 @@ Les autres appels concernent les notifications, les décisions chauffeurs, les d
 
 En production, héberger `dist/` et configurer un reverse proxy `/api` vers le backend; le proxy Vite ne fonctionne qu'en développement. Ne jamais mettre de secrets backend ou d'URI MongoDB dans des variables `VITE_*` ni dans le code client.
 
-## Travail d'équipe
-
-- Travailler sur `frontend` ou une branche dérivée `frontend/...`.
-- Ne pas pousser directement sur `main` ni réécrire l'historique distant.
-- Intégrer par Pull Request vers la branche de référence, une fois celle-ci établie avec l'équipe.
-- La séparation des branches ne garantit pas l'absence de conflits : convenir de l'organisation des dossiers avant de fusionner frontend et backend.
-- `server.ts`, `.env.local`, clés privées, `node_modules/` et `dist/` ne doivent pas être commités.
