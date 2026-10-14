@@ -435,7 +435,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
                 {/* Bouton d'accès rapide / Remplissage automatique test */}
                 <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-orange-50 border border-orange-200/90 p-3.5">
                   <div className="text-xs text-orange-900">
-                    <span className="font-bold">Compte DG test :</span> <code className="font-mono font-bold text-orange-700 bg-orange-100 px-1.5 py-0.5 rounded text-[11px]">admin@rapido.mr</code>
+                    <span className="font-bold">Compte test :</span> <code className="font-mono font-bold text-orange-700 bg-orange-100 px-1.5 py-0.5 rounded text-[11px]">admin@rapido.mr</code>
                   </div>
                   <button
                     type="button"
